@@ -9,11 +9,11 @@
     "type": "git",
     "url": "https://github.com/teebash/react-redux-starter.git"
   },
-  "license": "UNLICENSED",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/teebash/react-redux-starter/issues"
   },
-  "homepage": "http://www.tbash.co",
+  "homepage": "https://github.com/teebash/react-redux-starter",
   "dependencies": {
     "babel-polyfill": "^6.7.4",
     "humps": "^1.0.0",
