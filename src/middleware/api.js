@@ -1,11 +1,11 @@
-import { arrayOf, normalize } from 'normalizr'
-import { API_ROOT } from '../constants/Config'
-import { camelizeKeys } from 'humps'
-import 'isomorphic-fetch'
+import { arrayOf, normalize } from 'normalizr';
+import { API_ROOT } from '../constants/Config';
+import { camelizeKeys } from 'humps';
+import 'isomorphic-fetch';
 
-function callApi(endpoint, schema, authenticated) {
-  let token = localStorage.getItem('access_token') || null
-  let config = {}
+function callApi(endpoint, schema, authenticated, method = 'GET') {
+  let token = localStorage.getItem('access_token') || null;
+  let config = {};
 
   if(authenticated) {
     if(token) {
@@ -13,65 +13,63 @@ function callApi(endpoint, schema, authenticated) {
         headers: { 'Content-Type':'application/json',
                    'Authorization': `Bearer ${token}`
         }
-      }
+      };
     } else {
-      throw "token n/a"
+      throw "token n/a";
     }
   }
 
-  const fullUrl = (endpoint.indexOf(API_ROOT) === -1) ? API_ROOT + endpoint : endpoint
-  return fetch(fullUrl, config)
+  return fetch((API_ROOT + endpoint), config)
     .then(response =>
       response.json().then(json => ({ json, response }))
     ).then(({ json, response }) => {
       if (!response.ok) {
-        return Promise.reject(json)
+        return Promise.reject(json);
       }
 
-      const camelizedJson = camelizeKeys(json)
+      const camelizedJson = camelizeKeys(json);
 
-      return normalize(camelizedJson, schema)
+      return normalize(camelizedJson, schema);
     })
 }
 
-export const CALL_API = Symbol('Call API')
+export const CALL_API = Symbol('Call API');
 
 export default store => next => action => {
-  const callAPI = action[CALL_API]
+  const callAPI = action[CALL_API];
   if (typeof callAPI === 'undefined') {
-    return next(action)
+    return next(action);
   }
 
-  let { endpoint } = callAPI
-  const { schema, types, authenticated } = callAPI
-
-  if (typeof endpoint === 'function') {
-    endpoint = endpoint(store.getState())
-  }
+  let { endpoint } = callAPI;
+  const { schema, types, authenticated, method } = callAPI;
 
   if (typeof endpoint !== 'string') {
-    throw new Error('Specify a string endpoint URL.')
+    throw new Error('Specify a string endpoint URL.');
   }
   if (!schema) {
-    throw new Error('Specify one of the exported Schemas.')
+    throw new Error('Specify one of the exported Schemas.');
   }
   if (!Array.isArray(types) || types.length !== 3) {
-    throw new Error('Expected an array of three action types.')
+    throw new Error('Expected an array of three action types.');
   }
   if (!types.every(type => typeof type === 'string')) {
-    throw new Error('Expected action types to be strings.')
+    throw new Error('Expected action types to be strings.');
+  }
+  if (method !== 'POST' || method !== 'PUT') {
+    const method = 'GET';
   }
 
   function actionWith(data) {
-    const finalAction = Object.assign({}, action, data)
-    delete finalAction[CALL_API]
-    return finalAction
+    const finalAction = Object.assign({}, action, data);
+    delete finalAction[CALL_API];
+    return finalAction;
   }
 
-  const [ requestType, successType, failureType ] = types
-  next(actionWith({ type: requestType }))
+  const [ requestType, successType, failureType ] = types;
+  next(actionWith({ type: requestType }));
 
-  return callApi(endpoint, schema, authenticated).then(
+  return callApi(endpoint, schema, authenticated, 'POST').then(
     response => next(actionWith({
       response,
       authenticated,
@@ -79,7 +77,7 @@ export default store => next => action => {
     })),
     error => next(actionWith({
       type: failureType,
-      error: error.message || 'WTF Error'
+      error: error.message || 'Something has gone wrong.'
     }))
-  )
+  );
 }
