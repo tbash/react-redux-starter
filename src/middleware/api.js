@@ -3,16 +3,18 @@ import { API_ROOT } from '../constants/Config';
 import { camelizeKeys } from 'humps';
 import 'isomorphic-fetch';
 
-function callApi(endpoint, schema, authenticated, method = 'GET') {
+function callApi(endpoint, schema, authenticated, method, configBody) {
   let token = localStorage.getItem('access_token') || null;
   let config = {};
 
   if(authenticated) {
     if(token) {
       config = {
+        method: method,
         headers: { 'Content-Type':'application/json',
                    'Authorization': `Bearer ${token}`
-        }
+        },
+        body :configBody
       };
     } else {
       throw "token n/a";
@@ -42,7 +44,7 @@ export default store => next => action => {
   }
 
   let { endpoint } = callAPI;
-  const { schema, types, authenticated, method } = callAPI;
+  const { schema, types, authenticated, configMethod, configBody } = callAPI;
 
   if (typeof endpoint !== 'string') {
     throw new Error('Specify a string endpoint URL.');
@@ -56,8 +58,9 @@ export default store => next => action => {
   if (!types.every(type => typeof type === 'string')) {
     throw new Error('Expected action types to be strings.');
   }
-  if (method !== 'POST' || method !== 'PUT') {
-    const method = 'GET';
+  if (configMethod !== 'POST' || configMethod !== 'PUT') {
+    const configMethod = 'GET';
+    const configBody = null;
   }
 
   function actionWith(data) {
@@ -69,7 +72,7 @@ export default store => next => action => {
   const [ requestType, successType, failureType ] = types;
   next(actionWith({ type: requestType }));
 
-  return callApi(endpoint, schema, authenticated, 'POST').then(
+  return callApi(endpoint, schema, authenticated, configMethod, configBody).then(
     response => next(actionWith({
       response,
       authenticated,
