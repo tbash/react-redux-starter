@@ -14,7 +14,7 @@ function callApi(endpoint, schema, authenticated, method, configBody) {
         headers: { 'Content-Type':'application/json',
                    'Authorization': `Bearer ${token}`
         },
-        body :configBody
+        body: configBody
       };
     } else {
       throw "token n/a";
