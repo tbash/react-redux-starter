@@ -1,6 +1,5 @@
 import * as actionTypes from '../constants/ActionTypes'
 import { API_ROOT } from '../constants/Config'
-import 'isomorphic-fetch'
 
 function requestSignIn(creds) {
   return {

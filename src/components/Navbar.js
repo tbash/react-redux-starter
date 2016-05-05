@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import SignIn from './SignIn'
 import SignOut from './SignOut'
-import { signInUser, signOutUser } from '../actions/signIn'
+import { signInUser, signOutUser } from '../actions/auth'
 
 export default class Navbar extends Component {
   render() {

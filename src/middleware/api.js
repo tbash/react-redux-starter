@@ -1,7 +1,5 @@
 import { arrayOf, normalize } from 'normalizr';
 import { API_ROOT } from '../constants/Config';
-import { camelizeKeys } from 'humps';
-import 'isomorphic-fetch';
 
 function callApi(endpoint, schema, authenticated, method, configBody) {
   let token = localStorage.getItem('access_token') || null;
@@ -29,9 +27,7 @@ function callApi(endpoint, schema, authenticated, method, configBody) {
         return Promise.reject(json);
       }
 
-      const camelizedJson = camelizeKeys(json);
-
-      return normalize(camelizedJson, schema);
+      return normalize(json, schema);
     })
 }
 

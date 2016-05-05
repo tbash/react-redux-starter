@@ -1,6 +1,6 @@
 import * as actionTypes from '../constants/ActionTypes'
 
-export default function signIn(state = {
+export default function auth(state = {
     isFetching: false,
     isAuthenticated: localStorage.getItem('access_token') ? true : false
   }, action) {

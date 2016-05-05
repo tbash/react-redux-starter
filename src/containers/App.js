@@ -25,8 +25,8 @@ App.propTypes = {
 }
 
 function mapStateToProps(state) {
-  const { signIn } = state
-  const { isAuthenticated } = signIn
+  const { auth } = state
+  const { isAuthenticated } = auth
 
   return {
     isAuthenticated
